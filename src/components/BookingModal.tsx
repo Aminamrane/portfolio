@@ -7,6 +7,14 @@ import { motion, AnimatePresence } from "framer-motion";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://script.google.com/macros/s/AKfycbzSviCVLPGawf-4qZs9NFPstiEc0KJTZxApBAXiWnJ0K25nNAo4hQnP43_EHw81_xVERg/exec';
 const BOOKING_SECRET = process.env.NEXT_PUBLIC_BOOKING_SECRET || 'my-secret-key-123';
 
+// put this near the top of the file
+const ymd = (d: Date) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
 interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -55,8 +63,8 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
       const firstDay = new Date(year, month, 1);
       const lastDay = new Date(year, month + 1, 0);
       
-      const startDate = firstDay.toISOString().split('T')[0];
-      const endDate = lastDay.toISOString().split('T')[0];
+      const startDate = ymd(firstDay);
+      const endDate   = ymd(lastDay);
       
       const url = `${API_BASE_URL}?path=availability&start=${startDate}&end=${endDate}&visitorTz=${visitorTz}&secret=${BOOKING_SECRET}`;
       
@@ -201,7 +209,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
   const monthName = currentMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
   
   // Get slots for selected date
-  const selectedDateKey = selectedDate?.toISOString().split('T')[0];
+  const selectedDateKey = selectedDate ? ymd(selectedDate) : undefined;
   const availableSlots = selectedDateKey ? (slotsByDay[selectedDateKey] || []) : [];
 
   if (!isOpen) return null;
